@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tavar Olish Ro'yxati</title>
+  <style>
+    body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  background-color: #f4f4f4;
+  background-image: url('https://s.yimg.com/ny/api/res/1.2/vU_a.Bjmu4Qh2MhkjITYCA--/YXBwaWQ9aGlnaGxhbmRlcjt3PTEyNDI7aD02OTc-/https://media.zenfs.com/en/the_takeout_667/706b03152d0f691be26d71d74105a5c2');
+  background-size: cover; /* Rasmni ekran bo'ylab tarqatish */
+  background-position: center; /* Rasmni markazga joylash */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+      margin: 50px auto;
+      background-color: rgba(255, 255, 255, 0.8); /* Oq rangda, shaffoflik */
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      display: none; /* Dastlab yashirin */
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #startButton {
+      width: 3cm;  /* Tugma kengligi */
+      height: 1cm; /* Tugma bo'yi */
+      font-size: 18px;
+      padding: 5px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    #startButton:hover {
+      background-color: #2980b9;
+    }
+
+    #itemInput {
+      width: 60%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      display: inline-block;
+    }
+
+    #quantityInput {
+      width: 30%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 16px;
+      display: inline-block;
+    }
+
+    #addButton {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #addButton:hover {
+      background-color: #45a049;
+    }
+
+    .item-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    .item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px;
+      margin-bottom: 10px;
+      background-color: #f9f9f9;
+      border-radius: 5px;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    .item input[type="checkbox"] {
+      margin-right: 10px;
+    }
+
+    .item label {
+      flex-grow: 1;
+      font-size: 18px;
+      text-decoration: none;
+    }
+
+    .item button {
+      padding: 5px 10px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .item button:hover {
+      background-color: #e53935;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Start tugmasi -->
+  <button id="startButton">Start</button>
+
+  <!-- Tavarlar ro'yxati kontentini yashirish -->
+  <div class="container" id="mainContainer">
+    <h1>Tavar Olish Ro'yxati</h1>
+    <p class="intro-text" id="introText">Qaysi tavarlarni olish kerak:</p>
+
+    <input type="text" id="itemInput" placeholder="Tavarni kiriting...">
+    <input type="number" id="quantityInput" placeholder="Nechta kerak?" min="1">
+    <button id="addButton">Tavar qo'shish</button>
+
+    <ul id="itemList" class="item-list">
+      <!-- Tavarlar shu yerda ko'rsatiladi -->
+    </ul>
+  </div>
+
+  <script>
+    // DOM elementlari
+    const itemInput = document.getElementById('itemInput');
+    const quantityInput = document.getElementById('quantityInput');
+    const addButton = document.getElementById('addButton');
+    const itemList = document.getElementById('itemList');
+    const mainContainer = document.getElementById('mainContainer');
+    const startButton = document.getElementById('startButton');
+    const introText = document.getElementById('introText');
+
+    // Start tugmasini bosganda kontentni ko'rsatish
+    startButton.addEventListener('click', function() {
+      startButton.style.display = 'none'; // Start tugmasini yashirish
+      mainContainer.style.display = 'block'; // Tavarlar ro'yxatini ko'rsatish
+    });
+
+    // Enter tugmasi bilan tavar qo'shish
+    itemInput.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        addItem();
+      }
+    });
+
+    quantityInput.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        addItem();
+      }
+    });
+
+    // Tovarlarni qo'shish
+    addButton.addEventListener('click', addItem);
+
+    function addItem() {
+      const itemText = itemInput.value.trim();
+      const quantity = quantityInput.value.trim();
+
+      if (itemText !== "" && quantity !== "" && quantity > 0) {
+        const itemElement = document.createElement('li');
+        itemElement.classList.add('item');
+
+        // Tavar uchun checkbox
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.addEventListener('change', toggleItem);
+
+        // Tavar matni va kerakli miqdori
+        const label = document.createElement('label');
+        label.textContent = `${itemText} - ${quantity} dona`;
+
+        // Tavarni o'chirish tugmasi
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'O\'chirish';
+        deleteButton.addEventListener('click', deleteItem);
+
+        itemElement.appendChild(checkbox);
+        itemElement.appendChild(label);
+        itemElement.appendChild(deleteButton);
+
+        itemList.appendChild(itemElement);
+
+        // Input maydonlarini tozalash
+        itemInput.value = "";
+        quantityInput.value = "";
+      }
+    }
+
+    // Tavarni "olindi" deb belgilash
+    function toggleItem(event) {
+      const itemElement = event.target.parentElement;
+      const label = itemElement.querySelector('label');
+      
+      if (event.target.checked) {
+        label.style.textDecoration = 'line-through'; // Matnni chizish
+      } else {
+        label.style.textDecoration = 'none';
+      }
+    }
+
+    // Tavarni o'chirish
+    function deleteItem(event) {
+      const itemElement = event.target.parentElement;
+      itemList.removeChild(itemElement);
+    }
+  </script>
+
+</body>
+</html>
